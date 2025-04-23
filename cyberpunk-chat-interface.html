@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoChat - Cyberpunk Messaging</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        body {
+            background-color: #0a0a0f;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #d8e3e7;
+        }
+        
+        .container {
+            display: flex;
+            width: 90%;
+            height: 90vh;
+            background-color: #111116;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 30px rgba(0, 200, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            flex: 30%;
+            border-right: 1px solid #00ffff;
+            display: flex;
+            flex-direction: column;
+            background-color: #12121a;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            align-items: center;
+            background-color: #1a1a24;
+            height: 60px;
+            border-bottom: 1px solid #0c4a6e;
+            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.1);
+        }
+        
+        .user-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            background-color: #1e293b;
+            border: 1px solid #00ffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .user-img::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            animation: scan 2s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            color: #00ffff;
+        }
+        
+        .icon {
+            cursor: pointer;
+            font-size: 20px;
+            text-shadow: 0 0 5px #00ffff;
+            transition: all 0.2s ease;
+        }
+        
+        .icon:hover {
+            color: #ff00ff;
+            text-shadow: 0 0 8px #ff00ff;
+        }
+        
+        .search-container {
+            padding: 12px;
+            background-color: #12121a;
+        }
+        
+        .search-box {
+            background-color: #1a1a24;
+            border: 1px solid #0c4a6e;
+            border-radius: 5px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1) inset;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            margin-left: 10px;
+            width: 100%;
+            font-size: 14px;
+            background-color: transparent;
+            color: #d8e3e7;
+        }
+        
+        .search-box input::placeholder {
+            color: #64748b;
+        }
+        
+        .chats {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #12121a;
+        }
+        
+        .chats::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .chats::-webkit-scrollbar-thumb {
+            background-color: #00ffff;
+            border-radius: 5px;
+        }
+        
+        .chats::-webkit-scrollbar-track {
+            background-color: #1a1a24;
+        }
+        
+        .chat {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid #1a1a24;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chat:hover {
+            background-color: #1a1a24;
+            border-left: 3px solid #00ffff;
+        }
+        
+        .chat-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 5px;
+            background-color: #1e293b;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #0c4a6e;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-avatar::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #00ffff;
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 8px #00ffff;
+            animation: scan-line 1.5s linear infinite;
+        }
+        
+        @keyframes scan-line {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+        
+        .chat-info {
+            flex: 1;
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .chat-name {
+            font-weight: 500;
+            color: #00ffff;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .chat-time {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .chat-message {
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .chat-message-preview {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+        
+        .chat-badge {
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            color: #0f172a;
+            font-size: 12px;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 6px;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.5);
+        }
+        
+        .main-chat {
+            flex: 70%;
+            display: flex;
+            flex-direction: column;
+            background-color: #15151e;
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background-color: #1a1a24;
+            align-items: center;
+            height: 60px;
+            border-bottom: 1px solid #0c4a6e;
+        }
+        
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            background-color: #15151e;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.03) 0%, transparent 20%),
+                linear-gradient(rgba(0, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00ffff, #ff00ff);
+            border-radius: 5px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background-color: #1a1a24;
+        }
+        
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 12px;
+            border-radius: 5px;
+            max-width: 65%;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .message::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0, 255, 255, 0.5), transparent);
+        }
+        
+        .received {
+            background-color: #1a1a24;
+            border-left: 2px solid #00ffff;
+            align-self: flex-start;
+        }
+        
+        .received::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, #00ffff, transparent);
+        }
+        
+        .sent {
+            background-color: #1e293b;
+            border-right: 2px solid #ff00ff;
+            align-self: flex-end;
+        }
+        
+        .sent::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to left, #ff00ff, transparent);
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #64748b;
+            text-align: right;
+            margin-top: 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: #1a1a24;
+            gap: 10px;
+            border-top: 1px solid #0c4a6e;
+        }
+        
+        .emoji-btn, .attach-btn, .mic-btn {
+            color: #00ffff;
+            cursor: pointer;
+        }
+        
+        .input-box {
+            flex: 1;
+            background-color: #15151e;
+            border: 1px solid #0c4a6e;
+            border-radius: 5px;
+            padding: 9px 12px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1) inset;
+        }
+        
+        .input-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            background-color: transparent;
+            color: #d8e3e7;
+        }
+        
+        .input-box input::placeholder {
+            color: #64748b;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #00ffff, #0c4a6e);
+            color: #0f172a;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .send-btn:hover {
+            background: linear-gradient(135deg, #ff00ff, #9333ea);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+        
+        .cyberpunk-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        .icon-wrapper {
+            position: relative;
+        }
+        
+        .icon-wrapper::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #00ffff, transparent);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .icon-wrapper:hover::after {
+            opacity: 1;
+        }
+        
+        .user-icon::before {
+            content: "👤";
+        }
+        
+        .status-icon::before {
+            content: "⚡";
+        }
+        
+        .chat-icon::before {
+            content: "💬";
+        }
+        
+        .more-icon::before {
+            content: "⋮";
+        }
+        
+        .search-icon::before {
+            content: "🔍";
+        }
+        
+        .call-icon::before {
+            content: "📞";
+        }
+        
+        .video-icon::before {
+            content: "🎥";
+        }
+        
+        .emoji-icon::before {
+            content: "😊";
+        }
+        
+        .attach-icon::before {
+            content: "📎";
+        }
+        
+        .mic-icon::before {
+            content: "🎤";
+        }
+        
+        .avatar-placeholder::before {
+            content: "👤";
+            font-size: 24px;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #00ffff;
+            border-radius: 50%;
+            margin-left: 10px;
+            box-shadow: 0 0 8px #00ffff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 5px rgba(0, 255, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+            }
+        }
+        
+        /* Glitch effect for title */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00ff;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: 2px 0 #00ffff;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim-1 {
+            0% {
+                clip-path: inset(80% 0 0 0);
+            }
+            20% {
+                clip-path: inset(20% 0 60% 0);
+            }
+            40% {
+                clip-path: inset(40% 0 40% 0);
+            }
+            60% {
+                clip-path: inset(60% 0 20% 0);
+            }
+            80% {
+                clip-path: inset(0 0 80% 0);
+            }
+            100% {
+                clip-path: inset(50% 0 30% 0);
+            }
+        }
+        
+        @keyframes glitch-anim-2 {
+            0% {
+                clip-path: inset(0 0 70% 0);
+            }
+            20% {
+                clip-path: inset(50% 0 20% 0);
+            }
+            40% {
+                clip-path: inset(10% 0 60% 0);
+            }
+            60% {
+                clip-path: inset(70% 0 10% 0);
+            }
+            80% {
+                clip-path: inset(30% 0 40% 0);
+            }
+            100% {
+                clip-path: inset(0 0 100% 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-wrapper">
+        <h1 class="glitch" data-text="NEOCHAT">NEOCHAT</h1>
+    </div>
+    
+    <div class="container">
+        <!-- Left sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <div class="user-img avatar-placeholder"></div>
+                <div class="header-icons">
+                    <div class="icon-wrapper"><span class="status-icon icon"></span></div>
+                    <div class="icon-wrapper"><span class="chat-icon icon"></span></div>
+                    <div class="icon-wrapper"><span class="more-icon icon"></span></div>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon"></span>
+                    <input type="text" placeholder="SEARCH NETRUNNERS...">
+                </div>
+            </div>
+            
+            <div class="chats">
+                <!-- Chat 1 -->
+                <div class="chat">
+                    <div class="chat-avatar avatar-placeholder"></div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">ROGUE_RUNNER</div>
+                            <div class="chat-time">10:45</div>
+                        </div>
+                        <div class="chat-message">
+                            <div class="chat-message-preview">Got the neural implants you wanted</div>
+                            <div class="chat-badge">2</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat 2 -->
+                <div class="chat">
+                    <div class="chat-avatar avatar-placeholder"></div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">CYBER_MEDIC</div>
+                            <div class="chat-time">23:17</div>
+                        </div>
+                        <div class="chat-message">
+                            <div class="chat-message-preview">Your bio-scan results are ready</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat 3 -->
+                <div class="chat">
+                    <div class="chat-avatar avatar-placeholder"></div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">NEON_SYNDICATE</div>
+                            <div class="chat-time">01:13</div>
+                        </div>
+                        <div class="chat-message">
+                            <div class="chat-message-preview">Decker: Arasaka firewalls breached</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat 4 -->
+                <div class="chat">
+                    <div class="chat-avatar avatar-placeholder"></div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">BLACKMARKET_OPS</div>
+                            <div class="chat-time">19:45</div>
+                        </div>
+                        <div class="chat-message">
+                            <div class="chat-message-preview">New shipment of chrome at the docks</div>
+                            <div class="chat-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main chat area -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-avatar avatar-placeholder"></div>
+                    <div class="chat-name" style="margin-left: 15px;">ROGUE_RUNNER</div>
+                    <div class="online-indicator"></div>
+                </div>
+                <div class="header-icons">
+                    <div class="icon-wrapper"><span class="search-icon icon"></span></div>
+                    <div class="icon-wrapper"><span class="call-icon icon"></span></div>
+                    <div class="icon-wrapper"><span class="video-icon icon"></span></div>
+                    <div class="icon-wrapper"><span class="more-icon icon"></span></div>
+                </div>
+            </div>
+            
+            <div class="chat-messages">
+                <!-- Received message -->
+                <div class="message received">
+                    Got a new lead on that Militech data shard you wanted. Not cheap though.
+                    <div class="message-time">22:30</div>
+                </div>
+                
+                <!-- Sent message -->
+                <div class="message sent">
+                    How much are we talking? Last job paid well.
+                    <div class="message-time">22:32</div>
+                </div>
+                
+                <!-- Received message -->
+                <div class="message received">
+                    10k eddies. But this data's hot—corporate secrets level hot.
+                    <div class="message-time">22:33</div>
+                </div>
+                
+                <!-- Sent message -->
+                <div class="message sent">
+                    Worth it if it's genuine. When and where for the exchange?
+                    <div class="message-time">22:35</div>
+                </div>
+                
+                <!-- Received message -->
+                <div class="message received">
+                    The usual spot in Night City. Tomorrow at midnight. Come alone, corp eyes everywhere.
+                    <div class="message-time">22:40</div>
+                </div>
+                
+                <!-- Sent message -->
+                <div class="message sent">
+                    Always do. Need any specific gear for this run?
+                    <div class="message-time">22:42</div>
+                </div>
+                
+                <!-- Received message -->
+                <div class="message received">
+                    Bring your neural deck and that optical implant I got you. Might need to hack a scanner.
+                    <div class="message-time">22:45</div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="emoji-btn">
+                    <span class="emoji-icon icon"></span>
+                </div>
+                <div class="attach-btn">
+                    <span class="attach-icon icon"></span>
+                </div>
+                <div class="input-box">
+                    <input type="text" placeholder="ENTER MESSAGE...">
+                </div>
+                <button class="send-btn">SEND</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
